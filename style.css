@@ -1,0 +1,107 @@
+
+.header {
+    height: 15vh;
+    background-color: rgb(28, 213, 148);
+    color: white;
+    display: flex;
+    align-items: center;
+    font-size: 3rem;
+    padding-left: 2%;
+}
+
+.main {
+    min-height: 80vh;
+    display: flex;
+}
+
+.footer {
+    height: 3vh;
+    color: white;
+    background-color: rgb(37, 73, 60);
+    text-align: center;
+}
+
+
+/* Body */
+
+.nav {
+    min-width: clamp(15vw, 20vw, 25vw);
+    background-color: rgb(217, 214, 214);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 0.2rem;;
+}
+
+.navButton {
+    display: flex;
+    margin-top: 10%;
+    font-size: 1.2rem;
+    width: 75%;
+    text-align: start;
+    background-color: rgb(230, 239, 230);
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.content {
+    padding-left: 3%;
+    padding-right: 3%;
+    width: 100%;
+}
+
+/* Submission */
+
+.input {
+    width: clamp(210px, 410px, 500px);
+    margin-bottom: 1rem;
+    height: 5%;
+    font-size: 1rem;
+}
+
+.addButton {
+    background-color: rgb(66, 239, 115);
+    margin-right: 10px;
+    width: clamp(100px, 200px, 300px);
+    font-size: 1rem;
+}
+
+.cancelButton {
+    background-color: rgb(241, 109, 109);
+    width: clamp(100px, 200px, 300px);
+    font-size: 1rem;
+}
+
+
+/* List */
+
+.itemList {
+    margin-bottom: 5%;
+    display: flex;
+    flex-direction: column;
+}
+
+.item{
+    background-color: white;
+    border: none;
+    text-align: start;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+}
+
+.item:hover {
+    background-color: rgb(209, 204, 204);
+}
+
+
+/* Items on the List */
+
+.name {
+    width: clamp(60%, 70%, 80%)
+    /* margin-right: 30%; */
+}
+.date{ 
+    justify-content:right;
+    padding-right: 5%;
+}
