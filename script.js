@@ -49,12 +49,12 @@ let createLayout = (()=> {
         let nav = document.querySelector(".nav")
 
         //Create Nav Display
-        createChildElement("button", nav, "navButton", "Inbox")
-        createChildElement("button", nav, "navButton", "Today")
-        createChildElement("button", nav, "navButton", "Week")
-        createChildElement("button", nav, "navButton", "Month")
-        createChildElement("h2", nav, "projects", "Projects")
-        createChildElement("button", nav, "navButton", "+ Add Project")
+        createChildElement("button", nav, "navButton", "Inbox", "inbox")
+        createChildElement("button", nav, "navButton", "Today", "today")
+        createChildElement("button", nav, "navButton", "Week", "week")
+        createChildElement("button", nav, "navButton", "Month", "month")
+        createChildElement("h2", nav, "projects", "Projects", "projects")
+        createChildElement("button", nav, "navButton", "+ Add Project", "addProject")
 
         return main
     }
@@ -93,24 +93,10 @@ function CreateObject(title, date, priority) {
 
 
 //Object Array
-let orderGroceries = new CreateObject("Order Groceries", "2022-12-01", "high")
+let orderGroceries = new CreateObject("Order Groceries", "2022-12-02", "high")
 
 let objectArray = [orderGroceries]
 
-function dateConvertor(dateEntry) {
-
-    let month = dateEntry.getMonth() + 1
-    let day = dateEntry.getDate() 
-    let year = dateEntry.getFullYear()
-    
-    let newDate = `${month}/${day}/${year}`
-    console.log(newDate)
-
-    return newDate
-
-}
-let today = new Date()
-dateConvertor(today)
 
 
 
@@ -124,59 +110,58 @@ let listLogic = {
         body.appendChild(createLayout.createBody())
         body.appendChild(createLayout.createFooter())
     },
-
+    
     createItem(parent, name, date) {
-       
+        
         let element = document.createElement("div")
         let dueDate = document.createElement("div")
         let cancel = document.createElement("button")
-
-
+        
+        
         element.textContent = name
         element.classList.add("name")
-
+        
         dueDate.textContent = date
         dueDate.classList.add("date")
-
+        
         cancel.textContent = "X"
         cancel.classList.add("deleteItemButton")
-
+        
         parent.appendChild(element)
         parent.appendChild(dueDate)
         parent.appendChild(cancel)
-
+        
         
     },
-
+    
     displayList() {
-
+        
         let body = document.querySelector('.content')
         let itemList = document.querySelector(".itemList")
         // body.innerHTML = ""
         itemList.innerHTML = ""
-
-        //Check if Add Button Exists
-        if(document.querySelector(".addNewItem")) {
-            document.querySelector(".addNewItem").parentNode.removeChild(document.querySelector(".addNewItem"))
-        }
-
+        
         //Loop through Object Array to display Objects
         for (let i = 0; i < objectArray.length; i++) {
             createChildElement("button", itemList, "item", undefined, `${objectArray[i].title}`)
             this.createItem(document.getElementById(`${objectArray[i].title}`),`${objectArray[i].title}`, `${objectArray[i].date}`)
             
         }
-
-        //Create Button
-        createChildElement("button", body, "addNewItem", "+ Add Task")
-
-
-        //Listen for Submission
+        
+        //If Add Button does not exist and submission form is not appearing- recreate add button
+        if (!document.querySelector(".addNewItem") && !document.querySelector(".titleDiv")) {
+            //Create Button
+            createChildElement("button", body, "addNewItem", "+ Add Task")
+            this.newSubmission()
+        }
+        
+        //Button Listeners
         buttonLogic.deleteItem()
-        // buttonLogic.updateDate()
-        this.newSubmission()
+        buttonLogic.todaylist()
+        buttonLogic.inboxList()
+        
     },
-
+    
     newSubmission() {
         let addButton = document.querySelector(".addNewItem")
         addButton.addEventListener("click", () => {
@@ -187,17 +172,20 @@ let listLogic = {
             
         })
     },
-
+    
     createInput() {
         let body = document.querySelector('.content')
+        let submissionDiv = document.createElement("div")
+        submissionDiv.classList.add("submissionDiv")
+        body.appendChild(submissionDiv)
         
-
+        
         //Title Div
         let titleDiv = document.createElement("div")
         titleDiv.classList.add("titleDiv")
-        body.appendChild(titleDiv)
+        submissionDiv.appendChild(titleDiv)
         //Create Label
-
+        
         let nameLabel = document.createElement("Label")
         nameLabel.innerHTML = "Title:"
         nameLabel.classList.add("label")
@@ -206,77 +194,71 @@ let listLogic = {
         let nameInput = document.createElement("INPUT");
         nameInput.setAttribute("type", "text");
         nameInput.classList.add("input")
+        nameInput.setAttribute('required', '')
         titleDiv.appendChild(nameInput)
-
-
+        
+        
         //Date Div
         let dateDiv = document.createElement("div")
         dateDiv.classList.add("dateDiv")
-        body.appendChild(dateDiv)
+        submissionDiv.appendChild(dateDiv)
         //Create Label
-
+        
         let dateLabel = document.createElement("Label")
         dateLabel.innerHTML = "Date:"
         dateLabel.classList.add("label")
         dateDiv.appendChild(dateLabel)
         //Create Input
-        let dateInput = document.createElement("INPUT");
+        let dateInput = document.createElement("INPUT")
         dateInput.setAttribute("type", "date");
-        // dateInput.setAttribute("placeholder", "YYYY/MM/DD");
         dateInput.classList.add("dateInput")
+        dateInput.setAttribute('required', '')
         dateDiv.appendChild(dateInput)
-
+        
         //Create Button Div and buttons
         createChildElement("div", body, "buttonDiv", undefined)
         let buttonDiv = document.querySelector(".buttonDiv")
+        submissionDiv.appendChild(buttonDiv)
         createChildElement("button", buttonDiv, "addButton", "Add")
+        
+        // document.querySelector(".addButton").setAttribute("type", "submit")
         createChildElement("button", buttonDiv, "cancelButton", "Cancel")
         
-        //Event Listeners for Buttons
+        //Event Listeners for submission buttons
         this.addItem()
         this.cancelSubmission()
     },
-
+    
     addItem() {
         let addButton = document.querySelector(".addButton")
         addButton.addEventListener("click", () => {
-            console.log("Hello")
+            
 
-            //Create New Object
-            let newItem = new CreateObject(document.querySelector(".input").value, document.querySelector(".dateInput").value)
-            objectArray.push(newItem)
-            console.log(objectArray)
-
-
-            //load Item function
-            this.removeSubmit()
+            //If input fileds are present
+            if ((document.querySelector(".input").value) && (document.querySelector(".dateInput").value)) {
+                let newItem = new CreateObject(document.querySelector(".input").value, document.querySelector(".dateInput").value)
+                objectArray.push(newItem)
+                console.log(objectArray)
+                
+                this.removeSubmit()
+            } else alert("Title and Date fields are required.")
         })
     },
-
+    
     cancelSubmission() {
         let cancelButton = document.querySelector(".cancelButton")
-
+        
         cancelButton.addEventListener("click", ()=> {
-            let titleDiv = document.querySelector(".titleDiv")
-            let dateDiv = document.querySelector(".dateDiv")
-            let buttonDiv = document.querySelector(".buttonDiv")
-
-            titleDiv.parentNode.removeChild(titleDiv);
-            dateDiv.parentNode.removeChild(dateDiv);
-            buttonDiv.parentNode.removeChild(buttonDiv);
+            let submissionDiv = document.querySelector(".submissionDiv")
+            submissionDiv.parentNode.removeChild(submissionDiv);
             this.displayList()
-
+            
         })
     },
-
+    
     removeSubmit() {
-        let titleDiv = document.querySelector(".titleDiv")
-        let dateDiv = document.querySelector(".dateDiv")
-        let buttonDiv = document.querySelector(".buttonDiv")
-
-        titleDiv.parentNode.removeChild(titleDiv);
-        dateDiv.parentNode.removeChild(dateDiv);
-        buttonDiv.parentNode.removeChild(buttonDiv);
+        let submissionDiv = document.querySelector(".submissionDiv")    
+        submissionDiv.parentNode.removeChild(submissionDiv);
         this.displayList()
         // this.newSubmission()
     }
@@ -285,65 +267,129 @@ let listLogic = {
 
 
 let buttonLogic = {
-
+    
     deleteItem() {
-
+        
         let btns = document.querySelectorAll('.deleteItemButton');
-
+        
         btns.forEach(function (i) {
             i.addEventListener('click', function() {
                 let index = i.parentNode.id
-
-
-            let indexOfObject = objectArray.findIndex(object => {
-                return object.title == index;
-            })
-
-            console.log(indexOfObject)
-            objectArray.splice(indexOfObject,1)
-            console.log(objectArray)
                 
-            listLogic.displayList()
+                
+                let indexOfObject = objectArray.findIndex(object => {
+                    return object.title == index;
+                })
+                
+                console.log(indexOfObject)
+                objectArray.splice(indexOfObject,1)
+                console.log(objectArray)
+                
+                listLogic.displayList()
             });
         });
     },
-
+    
     updateDate() {
         let dates = document.querySelectorAll('.date');
-
+        
         dates.forEach(function (e) {
             e.addEventListener('change', function() {
                 //Object Title/ID
                 let item = e.parentNode.id
-    
-
+                
+                
                 let indexOfObject = objectArray.findIndex(object => {
                     return object.title == item;
                 })
-
                 
-            
+                
                 console.log(item)
                 console.log(e.parentNode)
-               
-            
+                
+                
                 ////Update Object
                 
                 console.log(indexOfObject)
                 objectArray[indexOfObject].date = document.querySelector(`.date`).value
-
+                
                 let date = objectArray[indexOfObject].date
                 console.log(date)
                 
                 
                 console.log(objectArray)
-
+                
                 listLogic.displayList()
             });
+        })
+    },
+
+    todaylist() {
+        let today = document.getElementById("today")
+        let bodyHeader = document.querySelector(".bodyHeader")
+        let itemList = document.querySelector(".itemList")
+
+        let dateToday = dateConvertor(new Date())
+
+        today.addEventListener("click", () => {
+
+            //Update Content
+            bodyHeader.textContent = today.textContent
+            itemList.innerHTML = ""
+
+            if (document.querySelector(".addNewItem")) {
+                document.querySelector(".addNewItem").parentNode.removeChild(document.querySelector(".addNewItem"))
+            }    
+            if (document.querySelector(".submissionDiv")) {
+                document.querySelector(".submissionDiv").parentNode.removeChild(document.querySelector(".submissionDiv"))
+            }   
+
+
+            
+            let filteredArray = objectArray.filter(obj => {
+                return obj.date === dateToday
+            })
+            console.log(dateToday)
+            console.log(filteredArray)
+            //Filter Through Object Array
+            for (let i = 0; i < filteredArray.length; i++) {
+
+                    createChildElement("button", itemList, "item", undefined, `${[i]}`)
+                    listLogic.createItem(document.getElementById(`${[i]}`),`${filteredArray[i].title}`, `${filteredArray[i].date}`)
+                
+            }
+            buttonLogic.deleteItem()
+        })
+    },
+
+    inboxList() {
+        let inbox = document.getElementById("inbox")
+        let bodyHeader = document.querySelector(".bodyHeader")
+    
+        inbox.addEventListener("click", () => {
+
+            bodyHeader.textContent = inbox.textContent
+            console.log("Hello")
+            listLogic.displayList()
         })
     }
 }
 
+function dateConvertor(dateEntry) {
+
+    let month =  (dateEntry.getMonth() + 1).toString().padStart(2, "0")
+    let day = dateEntry.getDate().toString().padStart(2, "0"); 
+    let year = dateEntry.getFullYear()
+    
+    let newDate = `${year}-${month}-${day}`
+    console.log(newDate)
+
+    return newDate
+
+}
+// let today = dateConvertor(new Date())
+// console.log(today)
+// dateConvertor(today)
 
 //ToDo List Logic
 listLogic.loadLayout()
